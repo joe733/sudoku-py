@@ -50,8 +50,7 @@ def process(img):
     thresh = cv2.adaptiveThreshold(denoise, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
     inverted = cv2.bitwise_not(thresh, 0)
     morph = cv2.morphologyEx(inverted, cv2.MORPH_OPEN, kernel)
-    dilated = cv2.dilate(morph, kernel, iterations=1)
-    return dilated
+    return cv2.dilate(morph, kernel, iterations=1)
 
 
 def get_corners(img):
@@ -67,9 +66,12 @@ def get_corners(img):
     bottom_left = np.argmax(sums)
     bottom_right = np.argmin(differences)
 
-    corners = [largest_contour[top_left], largest_contour[top_right], largest_contour[bottom_left],
-               largest_contour[bottom_right]]
-    return corners
+    return [
+        largest_contour[top_left],
+        largest_contour[top_right],
+        largest_contour[bottom_left],
+        largest_contour[bottom_right],
+    ]
 
 
 def transform(pts, img):  # TODO: Spline transform, remove this
@@ -182,8 +184,7 @@ def add_border(img_arr):
         except cv2.error:
             continue
     dims = (digits[0].shape[0],) * 2
-    digits_square = [cv2.resize(i, dims, interpolation=cv2.INTER_NEAREST) for i in digits]
-    return digits_square
+    return [cv2.resize(i, dims, interpolation=cv2.INTER_NEAREST) for i in digits]
 
 
 def subdivide(img, divisions=9):
@@ -223,8 +224,7 @@ def img_to_array(img_arr, img_dims):
         flt /= 255
         prediction = model.predict_classes(flt)
         predictions.append(prediction[0] + 1)  # OCR predicts from 0-8, changing it to 1-9
-    puzzle = np.array(predictions).reshape((9, 9))
-    return puzzle
+    return np.array(predictions).reshape((9, 9))
 
 
 def put_solution(img_arr, soln_arr, unsolved_arr, font_color, font_path):
@@ -315,8 +315,7 @@ def solve_image(fp, font_color, font_path):
     subd = subdivide(warped_img)
     subd_soln = put_solution(subd, solved, puzzle, font_color, font_path)
     warped_soln = stitch_img(subd_soln, (warped_img.shape[0], warped_img.shape[1]))
-    warped_inverse = inverse_perspective(warped_soln, img.copy(), np.array(corners))
-    return warped_inverse
+    return inverse_perspective(warped_soln, img.copy(), np.array(corners))
 
 
 def solve_webcam(font_color, font_path, debug=False):
@@ -419,7 +418,10 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    font_color = tuple([int(i) for i in args.color.split(',')]) if args.color else None
+    font_color = (
+        tuple(int(i) for i in args.color.split(',')) if args.color else None
+    )
+
     font_path = args.font if args.font else None
 
     if args.webcam:

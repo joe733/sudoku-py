@@ -12,8 +12,7 @@ with open('assets\\puzzles.json') as f:
 
 def puzzle_to_str(puzzle):
     str_puzzle = [[str(j) for j in i] for i in puzzle]
-    str_puzzle_spaces = [[' ' if j == '0' else j for j in i] for i in str_puzzle]
-    return str_puzzle_spaces
+    return [[' ' if j == '0' else j for j in i] for i in str_puzzle]
 
 
 counter = 0  # Counts each iteration of the puzzle
@@ -32,7 +31,7 @@ def array_to_image(array, output):
         counter += 1
         return
     # Only grabbing every nth frame, depending on how many iterations the solve took. Speeds up execution greatly
-    if not counter % frame_num == 0:
+    if counter % frame_num != 0:
         counter += 1
         return
     # Grabbing the base numbers to draw in blue
@@ -106,7 +105,7 @@ with open('assets\\puzzles.json') as f:  # Reloading the json because the puzzle
 solved = solve(puzzles[puzzle_num], True)  # Solving again to append frames to output
 
 # Appending solved frames to the end of the animation
-for i in range(frame_num * 80):
+for _ in range(frame_num * 80):
     array_to_image(solved, True)
 
 print('\nSaving output...')

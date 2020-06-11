@@ -51,8 +51,7 @@ def process(img):
     )
     inverted = cv2.bitwise_not(thresh, 0)
     morph = cv2.morphologyEx(inverted, cv2.MORPH_OPEN, kernel)
-    dilated = cv2.dilate(morph, kernel, iterations=1)
-    return dilated
+    return cv2.dilate(morph, kernel, iterations=1)
 
 
 def get_corners(img):
@@ -68,13 +67,12 @@ def get_corners(img):
     bottom_left = np.argmax(sums)
     bottom_right = np.argmin(differences)
 
-    corners = [
+    return [
         largest_contour[top_left],
         largest_contour[top_right],
         largest_contour[bottom_left],
         largest_contour[bottom_right],
     ]
-    return corners
 
 
 def transform(pts, img):  # TODO: Spline transform, remove this
@@ -193,8 +191,7 @@ def add_border(img_arr):
         except cv2.error:
             continue
     dims = (digits[0].shape[0],) * 2
-    digits_square = [cv2.resize(i, dims, interpolation=cv2.INTER_NEAREST) for i in digits]
-    return digits_square
+    return [cv2.resize(i, dims, interpolation=cv2.INTER_NEAREST) for i in digits]
 
 
 def subdivide(img, divisions=9):
@@ -236,8 +233,7 @@ def img_to_array(img_arr, img_dims):
         flt /= 255
         prediction = model.predict_classes(flt)
         predictions.append(prediction[0] + 1)  # OCR predicts from 0-8, changing it to 1-9
-    puzzle = np.array(predictions).reshape((9, 9))
-    return puzzle
+    return np.array(predictions).reshape((9, 9))
 
 
 def stitch_img(img_arr, img_dims):
