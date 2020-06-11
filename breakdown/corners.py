@@ -18,8 +18,7 @@ def process(img):
     )
     inverted = cv2.bitwise_not(thresh, 0)
     morph = cv2.morphologyEx(inverted, cv2.MORPH_OPEN, kernel)
-    dilated = cv2.dilate(morph, kernel, iterations=1)
-    return dilated
+    return cv2.dilate(morph, kernel, iterations=1)
 
 
 def get_corners(img):
@@ -35,13 +34,12 @@ def get_corners(img):
     bottom_left = np.argmax(sums)
     bottom_right = np.argmin(differences)
 
-    corners = [
+    return [
         largest_contour[top_left],
         largest_contour[top_right],
         largest_contour[bottom_left],
         largest_contour[bottom_right],
     ]
-    return corners
 
 
 def display_points(in_img, points, radius=20, color=(0, 0, 255)):

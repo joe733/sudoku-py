@@ -18,15 +18,13 @@ def process(img):
     )
     inverted = cv2.bitwise_not(thresh, 0)
     morph = cv2.morphologyEx(inverted, cv2.MORPH_OPEN, kernel)
-    dilated = cv2.dilate(morph, kernel, iterations=1)
-    return dilated
+    return cv2.dilate(morph, kernel, iterations=1)
 
 
 def get_edges(img):
     contours, hire = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     contours = sorted(contours, key=lambda x: cv2.contourArea(x), reverse=True)
-    largest_contour = np.squeeze(contours[0])
-    return largest_contour
+    return np.squeeze(contours[0])
 
 
 def main(path, out_path, framerate, dims):
